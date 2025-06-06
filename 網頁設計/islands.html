@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>離島景點推薦 | TravelGo</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: "Noto Sans TC", sans-serif;
+      background-color: #f2f2f2;
+    }
+    header {
+      background-color: #ff8c42;
+      color: white;
+      padding: 1rem;
+      text-align: center;
+      font-size: 1.8rem;
+    }
+    nav {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      background-color: #ffd8a9;
+      padding: 1rem;
+      font-weight: bold;
+    }
+    nav a {
+      color: #333;
+      text-decoration: none;
+    }
+    .container {
+      padding: 2rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+    .card {
+      background-color: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      overflow: hidden;
+      transition: transform 0.3s;
+    }
+    .card:hover {
+      transform: scale(1.02);
+    }
+    .card img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+    }
+    .card-content {
+      padding: 1rem;
+    }
+    .card h3 {
+      margin: 0 0 0.5rem 0;
+      color: #ff8c42;
+    }
+    footer {
+      background-color: #333;
+      color: white;
+      text-align: center;
+      padding: 1rem;
+      margin-top: 2rem;
+    }
+  </style>
+</head>
+<body>
+  <header>離島景點推薦</header>
+  <nav>
+    <a href="index.html">首頁</a>
+    <a href="north.html">北部</a>
+    <a href="central.html">中部</a>
+    <a href="south.html">南部</a>
+    <a href="islands.html">離島</a>
+    <a href="history.html">歷史景點</a>
+  </nav>
+  <main class="container">
+    <div class="card">
+      <img src="https://images.unsplash.com/photo-1605947644262-44df93063b87?auto=format&fit=crop&w=800&q=80" alt="澎湖雙心石滬">
+      <div class="card-content">
+        <h3>雙心石滬</h3>
+        <p>澎湖最浪漫的地標，由石塊堆砌成心型漁場，象徵永恆愛情。</p>
+        <p><strong>交通：</strong>搭船或飛機至澎湖，再轉乘租車前往七美。</p>
+      </div>
+    </div>
+    <div class="card">
+      <img src="https://images.unsplash.com/photo-1611117771986-1c8aa9023df1?auto=format&fit=crop&w=800&q=80" alt="蘭嶼拼板舟">
+      <div class="card-content">
+        <h3>蘭嶼拼板舟</h3>
+        <p>體驗達悟族文化特色與原始海洋風情，是原民文化深度旅遊的首選。</p>
+        <p><strong>交通：</strong>台東搭船或飛機至蘭嶼。</p>
+      </div>
+    </div>
+    <div class="card">
+      <img src="https://images.unsplash.com/photo-1627055625257-02c16c3e70aa?auto=format&fit=crop&w=800&q=80" alt="馬祖藍眼淚">
+      <div class="card-content">
+        <h3>馬祖藍眼淚</h3>
+        <p>春夏限定自然奇景，夜晚海面發出藍光，宛如夢幻仙境。</p>
+        <p><strong>交通：</strong>基隆或台北搭船／飛機至馬祖，當地觀光船前往觀賞。</p>
+      </div>
+    </div>
+  </main>
+  <footer>
+    © 2025 TravelGo 離島景點推薦頁 | 製作小組：走吧！旅行趣
+  </footer>
+</body>
+</html>

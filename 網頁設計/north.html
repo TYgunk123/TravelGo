@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>北部景點推薦 | TravelGo</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: "Noto Sans TC", sans-serif;
+      background-color: #f2f2f2;
+    }
+    header {
+      background-color: #ff8c42;
+      color: white;
+      padding: 1rem;
+      text-align: center;
+      font-size: 1.8rem;
+    }
+    nav {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      background-color: #ffd8a9;
+      padding: 1rem;
+      font-weight: bold;
+    }
+    nav a {
+      color: #333;
+      text-decoration: none;
+    }
+    .container {
+      padding: 2rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+    .card {
+      background-color: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      overflow: hidden;
+      transition: transform 0.3s;
+    }
+    .card:hover {
+      transform: scale(1.02);
+    }
+    .card img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+    }
+    .card-content {
+      padding: 1rem;
+    }
+    .card h3 {
+      margin: 0 0 0.5rem 0;
+      color: #ff8c42;
+    }
+    footer {
+      background-color: #333;
+      color: white;
+      text-align: center;
+      padding: 1rem;
+      margin-top: 2rem;
+    }
+  </style>
+</head>
+<body>
+  <header>北部景點推薦</header>
+  <nav>
+    <a href="index.html">首頁</a>
+    <a href="north.html">北部</a>
+    <a href="central.html">中部</a>
+    <a href="south.html">南部</a>
+    <a href="islands.html">離島</a>
+    <a href="history.html">歷史景點</a>
+  </nav>
+  <main class="container">
+    <div class="card">
+      <img src="https://images.unsplash.com/photo-1595310061894-375b07c7cb6b?auto=format&fit=crop&w=800&q=80" alt="台北101">
+      <div class="card-content">
+        <h3>台北101</h3>
+        <p>曾為世界第一高樓，提供觀景台、美食、與購物中心，是台北的重要地標。</p>
+        <p><strong>交通：</strong>搭捷運至信義線台北101/世貿站。</p>
+      </div>
+    </div>
+    <div class="card">
+      <img src="https://images.unsplash.com/photo-1549887534-525d0f6c2fc4?auto=format&fit=crop&w=800&q=80" alt="陽明山國家公園">
+      <div class="card-content">
+        <h3>陽明山國家公園</h3>
+        <p>以溫泉、火山地形與花卉景觀著稱，春季有盛大的花季活動。</p>
+        <p><strong>交通：</strong>搭捷運至劍潭站，轉乘公車。</p>
+      </div>
+    </div>
+    <div class="card">
+      <img src="https://images.unsplash.com/photo-1524638437808-4b7b90a33282?auto=format&fit=crop&w=800&q=80" alt="士林夜市">
+      <div class="card-content">
+        <h3>士林夜市</h3>
+        <p>台北最著名的夜市之一，提供各式台灣小吃與特色商品，是觀光客必訪之地。</p>
+        <p><strong>交通：</strong>捷運劍潭站步行即可到達。</p>
+      </div>
+    </div>
+  </main>
+  <footer>
+    © 2025 TravelGo 北部景點推薦頁 | 製作小組：走吧！旅行趣
+  </footer>
+</body>
+</html>
