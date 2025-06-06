@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>TravelGo 旅遊景點推薦網</title>
   <style>
     body {
@@ -83,6 +83,10 @@
       transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s;
       cursor: pointer;
       transform-origin: center;
+      text-decoration: none;
+      color: #333;
+      display: inline-block;
+      width: 180px;
     }
 
     .area-link:hover {
@@ -95,6 +99,62 @@
       color: white;
       text-align: center;
       padding: 1rem;
+    }
+
+    /* RWD 響應式調整 */
+    @media (max-width: 768px) {
+      nav {
+        flex-direction: column;
+        gap: 1rem;
+        padding: 1rem 2rem;
+      }
+      nav a {
+        font-size: 1.1rem;
+      }
+
+      .features {
+        flex-direction: column;
+        align-items: center;
+        padding: 1rem;
+      }
+      .feature-card {
+        width: 90%;  /* 改成百分比寬度，手機螢幕適合 */
+      }
+
+      .areas {
+        flex-direction: column;
+        padding: 1rem 2rem;
+        gap: 1rem;
+      }
+      .area-link {
+        width: 100%;
+        padding: 1.5rem;
+        font-size: 1.1rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      header h1 {
+        font-size: 1.8rem;
+        padding: 1rem;
+      }
+      .intro {
+        padding: 1rem;
+      }
+      .intro h2 {
+        font-size: 1.4rem;
+      }
+      nav a {
+        font-size: 1rem;
+      }
+      .feature-card {
+        width: 100%;
+        padding: 1rem 0.5rem;
+      }
+      .area-link {
+        padding: 1rem;
+        font-size: 1rem;
+      }
     }
   </style>
 </head>
@@ -111,6 +171,7 @@
     <a href="islands.html">離島</a>
     <a href="history.html">歷史景點</a>
   </nav>
+  
 
   <section class="intro">
     <h2>探索台灣，從這裡開始！</h2>
