@@ -27,30 +27,6 @@
       overflow: hidden;
       padding: 1.5rem;
     }
-
-    nav {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 1rem;
-      background-color: #ffd8a9;
-      padding: 1rem;
-      font-weight: bold;
-    }
-
-    nav a {
-      color: #333;
-      text-decoration: none;
-    }
-
-    .container {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr); /* 每列3個 */
-      gap: 1.5rem; /* 卡片間距 */
-      justify-items: center; /* 讓card水平置中 */
-      padding: 2rem;
-    }
-
     .spot-img {
       width: 100%;
       height: 400px;
@@ -81,7 +57,6 @@
     .map-link a:hover {
       background-color: #e6731d;
     }
-
     iframe {
       width: 100%;
       height: 315px;
@@ -89,33 +64,56 @@
       margin-top: 1.5rem;
       border-radius: 8px;
     }
-
-    /* 留言區 */
-    .comments-section {
+    .comment-section {
       margin-top: 2rem;
+      border-top: 2px solid #eee;
+      padding-top: 1.5rem;
     }
-    .comment {
-      background-color: #f0f0f0;
-      padding: 1rem;
-      border-radius: 8px;
+    .comment-section h3 {
+      color: #ff8c42;
       margin-bottom: 1rem;
     }
+    .comment-form {
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+      margin-bottom: 1.5rem;
+    }
+    .comment-form input,
     .comment-form textarea {
-      width: 100%;
-      padding: 0.5rem;
-      border-radius: 6px;
+      padding: 0.7rem;
+      font-size: 1rem;
       border: 1px solid #ccc;
-      resize: vertical;
-      min-height: 80px;
+      border-radius: 6px;
+      width: 100%;
+      box-sizing: border-box;
     }
     .comment-form button {
       background-color: #ff8c42;
       color: white;
-      padding: 0.5rem 1rem;
+      padding: 0.6rem 1rem;
       border: none;
       border-radius: 6px;
       cursor: pointer;
-      margin-top: 0.5rem;
+      transition: background-color 0.3s;
+      align-self: flex-end;
+    }
+    .comment-form button:hover {
+      background-color: #e6731d;
+    }
+    .comment {
+      background-color: #f2f2f2;
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+    }
+    .comment strong {
+      color: #333;
+      font-weight: 600;
+    }
+    .comment p {
+      margin: 0.3rem 0 0 0;
+      color: #444;
     }
 
     footer {
@@ -134,59 +132,41 @@
 </head>
 <body>
   <header>景點詳細資訊</header>
-
-  <nav>
-    <a href="index.html">首頁</a>
-    <a href="north.html">北部</a>
-    <a href="central.html">中部</a>
-    <a href="south.html">南部</a>
-    <a href="islands.html">離島</a>
-    <a href="east.html">東部</a>
-  </nav>
-
   <div class="container" id="detail-container">載入中...</div>
 
-  <!-- 評論區 -->
-  <div class="container">
-    <h3>🗣️ 景點評論</h3>
-    <div class="comment-form">
-      <textarea id="comment-input" placeholder="留下你的評論..."></textarea>
-      <button onclick="submitComment()">送出評論</button>
-    </div>
-    <div id="comments-list"></div>
-  </div>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-
-  <script>
-    // Firebase 設定
     const firebaseConfig = {
       apiKey: "AIzaSyCfT20L-v8VdPg5jY0wWCzjTvAEPQwSoAs",
       authDomain: "comments-c9216.firebaseapp.com",
+      databaseURL: "https://comments-c9216-default-rtdb.firebaseio.com",
       projectId: "comments-c9216",
-      storageBucket: "comments-c9216.firebasestorage.app",
+      storageBucket: "comments-c9216.appspot.com",
       messagingSenderId: "920624408343",
-      appId: "1:920624408343:web:a901291a83557c7227f952"
+      appId: "1:920624408343:web:a901291a83557c7227f952",
+      measurementId: "G-EVWSLGGNDC"
     };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase();
+    const auth = getAuth(app);
 
+    // 取得留言地點 ID
     const params = new URLSearchParams(window.location.search);
     const id = params.get("id");
+    const container = document.getElementById("detail-container");
 
-    // 顯示景點資料 + YouTube
-    const API_KEY = "AIzaSyB_wJyzDT4coO3qI29HFVUnHHsrYs5NsRQ";
     if (!id) {
-      document.getElementById("detail-container").innerHTML = "❌ 無效的景點 ID。";
+      container.innerHTML = "❌ 無效的景點 ID。";
     } else {
       fetch("https://tdx.transportdata.tw/api/basic/v2/Tourism/ScenicSpot?$format=JSON")
         .then(res => res.json())
         .then(async data => {
           const spot = data.find(s => s.ScenicSpotID === id);
           if (!spot) {
-            document.getElementById("detail-container").innerHTML = "❌ 找不到景點資訊。";
+            container.innerHTML = "❌ 找不到景點資訊。";
             return;
           }
 
@@ -196,6 +176,7 @@
           const img = spot.Picture?.PictureUrl1 || "無圖片.png";
           const mapQuery = encodeURIComponent(name);
 
+          const API_KEY = "AIzaSyB_wJyzDT4coO3qI29HFVUnHHsrYs5NsRQ";
           const videoId = await fetch(`https://www.googleapis.com/youtube/v3/search?key=${API_KEY}&part=snippet&type=video&maxResults=1&q=${mapQuery}`)
             .then(res => res.json())
             .then(json => json.items?.[0]?.id?.videoId)
@@ -203,9 +184,13 @@
 
           const youtubeEmbed = videoId
             ? `<h3>🎬 相關影片</h3><iframe src="https://www.youtube.com/embed/${videoId}" allowfullscreen></iframe>`
-            : `<div style="text-align:center; margin-top:1.5rem;"><a href="https://www.youtube.com/results?search_query=${mapQuery}" target="_blank">🔍 無法自動取得影片，點我到 YouTube 搜尋</a></div>`;
+            : `<div style="text-align:center; margin-top:1.5rem;">
+                <a href="https://www.youtube.com/results?search_query=${mapQuery}" target="_blank">
+                  🔍 無法自動取得影片，點我到 YouTube 搜尋
+                </a>
+              </div>`;
 
-          document.getElementById("detail-container").innerHTML = `
+          container.innerHTML = `
             <img class="spot-img" src="${img}" alt="${name}" onerror="this.src='無圖片.png'">
             <h2>${name}</h2>
             <p>${desc}</p>
@@ -216,47 +201,72 @@
               </a>
             </div>
             ${youtubeEmbed}
+            <div class="comment-section">
+              <h3>🗨️ 景點評論</h3>
+              <form class="comment-form" id="comment-form">
+                <textarea id="comment" rows="3" placeholder="分享你的心得..." required></textarea>
+                <button type="submit">送出評論</button>
+              </form>
+              <div id="comments-container"></div>
+            </div>
           `;
-        });
-    }
 
-    // 提交評論
-    function submitComment() {
-      const input = document.getElementById("comment-input");
-      const text = input.value.trim();
-      if (text && id) {
-        const commentRef = db.ref("comments/" + id).push();
-        commentRef.set({
-          text,
-          timestamp: Date.now()
-        });
-        input.value = "";
-      }
-    }
+          const form = document.getElementById("comment-form");
+          const commentsContainer = document.getElementById("comments-container");
 
-    // 監聽評論更新
-    if (id) {
-      const commentsList = document.getElementById("comments-list");
-      const commentsRef = db.ref("comments/" + id);
-      commentsRef.on("value", snapshot => {
-        const data = snapshot.val();
-        commentsList.innerHTML = "";
-        if (data) {
-          const comments = Object.values(data).sort((a, b) => b.timestamp - a.timestamp);
-          comments.forEach(comment => {
-            const div = document.createElement("div");
-            div.className = "comment";
-            const date = new Date(comment.timestamp).toLocaleString();
-            div.innerHTML = `<p>${comment.text}</p><small>${date}</small>`;
-            commentsList.appendChild(div);
+          let userEmail = "匿名用戶";
+
+          // 監聽登入狀態
+          onAuthStateChanged(auth, user => {
+            if (user) {
+              userEmail = user.email || "匿名用戶";
+            }
           });
-        }
-      });
+
+          // 提交評論
+          form.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const text = document.getElementById("comment").value.trim();
+            if (!text) return;
+
+            const newComment = {
+              email: userEmail,
+              text,
+              timestamp: Date.now()
+            };
+
+            // 立即顯示
+            const el = document.createElement("div");
+            el.className = "comment";
+            el.innerHTML = `<strong>${newComment.email}</strong><p>${newComment.text}</p>`;
+            commentsContainer.prepend(el);
+
+            await push(ref(db, `comments/${id}`), newComment);
+            form.reset();
+          });
+
+          // 載入留言
+          onValue(ref(db, `comments/${id}`), (snapshot) => {
+            const comments = snapshot.val();
+            if (comments) {
+              commentsContainer.innerHTML = "";
+              const sorted = Object.values(comments).sort((a, b) => b.timestamp - a.timestamp);
+              sorted.forEach(c => {
+                const el = document.createElement("div");
+                el.className = "comment";
+                el.innerHTML = `<strong>${c.email}</strong><p>${c.text}</p>`;
+                commentsContainer.appendChild(el);
+              });
+            }
+          });
+        })
+        .catch(() => {
+          container.innerHTML = "❌ 資料載入失敗。";
+        });
     }
   </script>
-
   <footer>
-    © 2025 TravelGo 台灣旅遊推薦網 | 製作小組：走吧！旅行趣
+    © 2025 TravelGo 南部景點推薦頁 | 製作小組：走吧！旅行趣
   </footer>
   <script>
     // ===== 3. Footer 滑動效果 =====
