@@ -140,8 +140,8 @@
     <a href="north.html">北部</a>
     <a href="central.html">中部</a>
     <a href="south.html">南部</a>
-    <a href="islands.html">離島</a>
     <a href="east.html">東部</a>
+    <a href="islands.html">離島</a>
   </nav>
   <!-- 新增顯示隨機景點的區塊 -->
   <div id="scenic-spots" class="container"></div>
@@ -154,7 +154,7 @@
           .then(res => res.json())
           .then(data => {
             // ✅ 篩選「東部地區」的城市
-            const northCities = ['臺北市', '新北市', '基隆市', '宜蘭縣', '桃園市', '新竹縣', '新竹市'];
+            const northCities = ['花蓮縣', '台東縣'];
             const northSpots = data.filter(spot => northCities.includes(spot.City));
             
 
