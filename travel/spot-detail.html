@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>景點詳細資訊 | TravelGo</title>
+  <style>
+    body {
+      font-family: "Noto Sans TC", sans-serif;
+      background-color: #f9f9f9;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background-color: #ff8c42;
+      color: white;
+      padding: 1rem;
+      text-align: center;
+      font-size: 1.8rem;
+    }
+    .container {
+      max-width: 800px;
+      margin: 2rem auto;
+      background-color: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      overflow: hidden;
+      padding: 1.5rem;
+    }
+
+    nav {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 1rem;
+      background-color: #ffd8a9;
+      padding: 1rem;
+      font-weight: bold;
+    }
+
+    nav a {
+      color: #333;
+      text-decoration: none;
+    }
+
+    .container {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr); /* 每列3個 */
+      gap: 1.5rem; /* 卡片間距 */
+      justify-items: center; /* 讓card水平置中 */
+      padding: 2rem;
+    }
+
+    .spot-img {
+      width: 100%;
+      height: 400px;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+    h2 {
+      color: #ff8c42;
+      margin-top: 1rem;
+    }
+    p {
+      color: #333;
+      line-height: 1.6;
+    }
+    .map-link {
+      margin-top: 1.5rem;
+      text-align: center;
+    }
+    .map-link a {
+      text-decoration: none;
+      background-color: #ff8c42;
+      color: white;
+      padding: 0.6rem 1rem;
+      border-radius: 6px;
+      display: inline-block;
+      transition: background-color 0.3s;
+    }
+    .map-link a:hover {
+      background-color: #e6731d;
+    }
+
+    iframe {
+      width: 100%;
+      height: 315px;
+      border: none;
+      margin-top: 1.5rem;
+      border-radius: 8px;
+    }
+
+    /* 留言區 */
+    .comments-section {
+      margin-top: 2rem;
+    }
+    .comment {
+      background-color: #f0f0f0;
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+    }
+    .comment-form textarea {
+      width: 100%;
+      padding: 0.5rem;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      resize: vertical;
+      min-height: 80px;
+    }
+    .comment-form button {
+      background-color: #ff8c42;
+      color: white;
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-top: 0.5rem;
+    }
+
+    footer {
+      background-color: #333;
+      color: white;
+      text-align: center;
+      padding: 1rem;
+      position: fixed;
+      left: 0;
+      bottom: 0;
+      width: 100%;
+      z-index: 100;
+      transition: transform 0.4s;
+    }
+  </style>
+</head>
+<body>
+  <header>景點詳細資訊</header>
+
+  <nav>
+    <a href="index.html">首頁</a>
+    <a href="north.html">北部</a>
+    <a href="central.html">中部</a>
+    <a href="south.html">南部</a>
+    <a href="islands.html">離島</a>
+    <a href="east.html">東部</a>
+  </nav>
+
+  <div class="container" id="detail-container">載入中...</div>
+
+  <!-- 評論區 -->
+  <div class="container">
+    <h3>🗣️ 景點評論</h3>
+    <div class="comment-form">
+      <textarea id="comment-input" placeholder="留下你的評論..."></textarea>
+      <button onclick="submitComment()">送出評論</button>
+    </div>
+    <div id="comments-list"></div>
+  </div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+  <script>
+    // Firebase 設定
+    const firebaseConfig = {
+      apiKey: "AIzaSyCfT20L-v8VdPg5jY0wWCzjTvAEPQwSoAs",
+      authDomain: "comments-c9216.firebaseapp.com",
+      projectId: "comments-c9216",
+      storageBucket: "comments-c9216.firebasestorage.app",
+      messagingSenderId: "920624408343",
+      appId: "1:920624408343:web:a901291a83557c7227f952"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get("id");
+
+    // 顯示景點資料 + YouTube
+    const API_KEY = "AIzaSyB_wJyzDT4coO3qI29HFVUnHHsrYs5NsRQ";
+    if (!id) {
+      document.getElementById("detail-container").innerHTML = "❌ 無效的景點 ID。";
+    } else {
+      fetch("https://tdx.transportdata.tw/api/basic/v2/Tourism/ScenicSpot?$format=JSON")
+        .then(res => res.json())
+        .then(async data => {
+          const spot = data.find(s => s.ScenicSpotID === id);
+          if (!spot) {
+            document.getElementById("detail-container").innerHTML = "❌ 找不到景點資訊。";
+            return;
+          }
+
+          const name = spot.ScenicSpotName || "未命名景點";
+          const desc = spot.DescriptionDetail || "無詳細介紹";
+          const address = spot.Address || "無地址資訊";
+          const img = spot.Picture?.PictureUrl1 || "無圖片.png";
+          const mapQuery = encodeURIComponent(name);
+
+          const videoId = await fetch(`https://www.googleapis.com/youtube/v3/search?key=${API_KEY}&part=snippet&type=video&maxResults=1&q=${mapQuery}`)
+            .then(res => res.json())
+            .then(json => json.items?.[0]?.id?.videoId)
+            .catch(() => null);
+
+          const youtubeEmbed = videoId
+            ? `<h3>🎬 相關影片</h3><iframe src="https://www.youtube.com/embed/${videoId}" allowfullscreen></iframe>`
+            : `<div style="text-align:center; margin-top:1.5rem;"><a href="https://www.youtube.com/results?search_query=${mapQuery}" target="_blank">🔍 無法自動取得影片，點我到 YouTube 搜尋</a></div>`;
+
+          document.getElementById("detail-container").innerHTML = `
+            <img class="spot-img" src="${img}" alt="${name}" onerror="this.src='無圖片.png'">
+            <h2>${name}</h2>
+            <p>${desc}</p>
+            <p><strong>地址：</strong>${address}</p>
+            <div class="map-link">
+              <a href="https://www.google.com/maps/search/?q=${mapQuery}" target="_blank">
+                📍 在 Google 地圖上查看
+              </a>
+            </div>
+            ${youtubeEmbed}
+          `;
+        });
+    }
+
+    // 提交評論
+    function submitComment() {
+      const input = document.getElementById("comment-input");
+      const text = input.value.trim();
+      if (text && id) {
+        const commentRef = db.ref("comments/" + id).push();
+        commentRef.set({
+          text,
+          timestamp: Date.now()
+        });
+        input.value = "";
+      }
+    }
+
+    // 監聽評論更新
+    if (id) {
+      const commentsList = document.getElementById("comments-list");
+      const commentsRef = db.ref("comments/" + id);
+      commentsRef.on("value", snapshot => {
+        const data = snapshot.val();
+        commentsList.innerHTML = "";
+        if (data) {
+          const comments = Object.values(data).sort((a, b) => b.timestamp - a.timestamp);
+          comments.forEach(comment => {
+            const div = document.createElement("div");
+            div.className = "comment";
+            const date = new Date(comment.timestamp).toLocaleString();
+            div.innerHTML = `<p>${comment.text}</p><small>${date}</small>`;
+            commentsList.appendChild(div);
+          });
+        }
+      });
+    }
+  </script>
+
+  <footer>
+    © 2025 TravelGo 台灣旅遊推薦網 | 製作小組：走吧！旅行趣
+  </footer>
+  <script>
+    // ===== 3. Footer 滑動效果 =====
+      let lastScrollY = window.scrollY;
+      const footer = document.querySelector('footer');
+
+      function handleFooter() {
+        if (window.scrollY > lastScrollY) {
+          // 向下捲動，footer滑入
+          footer.style.transform = 'translateY(0)';
+        } else {
+          // 向上捲動，footer滑出
+          footer.style.transform = 'translateY(100%)';
+        }
+        lastScrollY = window.scrollY;
+      }
+
+      window.addEventListener('scroll', handleFooter);
+
+      // 預設footer隱藏
+      footer.style.transition = 'transform 0.4s';
+      footer.style.transform = 'translateY(100%)';
+  </script>
+</body>
+</html>
