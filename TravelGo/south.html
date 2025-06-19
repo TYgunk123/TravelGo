@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>南部景點推薦 | TravelGo</title>
+    <style>
+      body {
+        margin: 0;
+        font-family: "Noto Sans TC", sans-serif;
+        background-color: #f2f2f2;
+      }
+
+      header {
+        background-color: #ff8c42;
+        color: white;
+        padding: 1rem;
+        text-align: center;
+        font-size: 1.8rem;
+      }
+
+      nav {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 1rem;
+        background-color: #ffd8a9;
+        padding: 1rem;
+        font-weight: bold;
+      }
+
+      nav a {
+        color: #333;
+        text-decoration: none;
+      }
+
+      .container {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr); /* 每列3個 */
+        gap: 1.5rem; /* 卡片間距 */
+        justify-items: center; /* 讓card水平置中 */
+        padding: 2rem;
+      }
+
+      .card {
+        width: 400px;
+        background-color: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        transition: transform 0.3s;
+      }
+
+      .card:hover {
+        transform: scale(1.02);
+      }
+
+      .card img {
+        width: 400px;
+        height: 250px;
+        object-fit: cover;
+      }
+
+      .card-content {
+        padding: 1rem;
+      }
+
+      .card-content h3 {
+        margin: 0 0 0.5rem 0;
+        color: #ff8c42;
+        font-size: 1.3rem;
+      }
+
+      .card-content p {
+        margin: 0.3rem 0;
+        font-size: 1rem;
+        color: black; /* 加上這行 */
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      footer {
+        background-color: #333;
+        color: white;
+        text-align: center;
+        padding: 1rem;
+        position: fixed;
+        left: 0;
+        bottom: 0;
+        width: 100%;
+        z-index: 100;
+        transition: transform 0.4s;
+      }
+
+      .ellipsis {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      /* ===== 卡片容器 RWD，平板改成2欄，手機1欄 ===== */
+      @media (max-width: 1024px) {
+        .container {
+          grid-template-columns: repeat(2, 1fr);
+          padding: 1.5rem;
+          gap: 1.2rem;
+        }
+
+        .card {
+          width: 100%;
+          max-width: 380px;
+        }
+
+        .card img {
+          width: 100%;
+          height: 200px;
+        }
+      }
+
+      @media (max-width: 600px) {
+        /* nav 橫排維持 */
+        nav {
+          flex-wrap: nowrap;
+          gap: 0.5rem;
+          padding: 0.6rem 1rem;
+        }
+
+        nav a {
+          font-size: 0.95rem;
+        }
+
+        .container {
+          grid-template-columns: 1fr; /* 1欄 */
+          padding: 1rem;
+          gap: 1rem;
+        }
+
+        .card {
+          width: 100%;
+          max-width: 320px;
+        }
+
+        .card img {
+          height: 180px;
+        }
+
+        footer {
+          font-size: 13px;
+          padding: 0.8rem 1rem;
+        }
+      }
+
+      /* RWD調整 header字體 */
+      @media (max-width: 600px) {
+        header {
+          font-size: 1.5rem;
+          padding: 0.8rem;
+        }
+      }
+    </style>
+  </head>
+  <!-- ...existing code... -->
+  <body>
+    <header>南部景點推薦</header>
+    <nav>
+      <a href="index.html">首頁</a>
+      <a href="north.html">北部</a>
+      <a href="central.html">中部</a>
+      <a href="south.html">南部</a>
+      <a href="east.html">東部</a>
+      <a href="islands.html">離島</a>
+    </nav>
+    <!-- 新增顯示隨機景點的區塊 -->
+    <div id="scenic-spots" class="container"></div>
+    <main class="container">
+      <script>
+        function loadScenicSpots() {
+          window.scrollTo({ top: 0, behavior: "smooth" });
+
+          fetch(
+            "https://tdx.transportdata.tw/api/basic/v2/Tourism/ScenicSpot?$format=JSON"
+          )
+            .then((res) => res.json())
+            .then((data) => {
+              // ✅ 篩選「南部地區」的城市
+              const northCities = [
+                "嘉義市",
+                "嘉義縣",
+                "台南市",
+                "高雄市",
+                "屏東縣",
+              ];
+              const northSpots = data.filter((spot) =>
+                northCities.includes(spot.City)
+              );
+
+              const box = document.getElementById("scenic-spots");
+              box.innerHTML = "";
+
+              // 🎲 打亂順序
+              const shuffled = northSpots.sort(() => 0.5 - Math.random());
+
+              shuffled.slice(0, 21).forEach((spot) => {
+                const id = encodeURIComponent(spot.ScenicSpotID);
+                const name = spot.ScenicSpotName || "未命名景點";
+                const description =
+                  spot.DescriptionDetail?.trim() || "無詳細介紹";
+                const address = spot.Address?.trim() || "無地址資訊";
+                const imageUrl = spot.Picture?.PictureUrl1 || "無圖片.png";
+
+                box.innerHTML += `
+                <a href="spot-detail.html?id=${id}" style="text-decoration: none;">
+                  <div class="card">
+                    <img src="${imageUrl}" alt="${name}">
+                    <div class="card-content">
+                      <h3>${name}</h3>
+                      <p style="color:black;">${description}</p>
+                      <p style="color:black;">地址：${address}</p>
+                    </div>
+                  </div>
+                </a>`;
+              });
+            })
+            .catch(() => {
+              document.getElementById("scenic-spots").innerText =
+                "景點資料載入失敗";
+            });
+        }
+
+        loadScenicSpots();
+      </script>
+    </main>
+    <div style="text-align: center; margin-bottom: 5rem">
+      <button
+        onclick="loadScenicSpots()"
+        style="
+          padding: 0.6rem 1.2rem;
+          font-size: 1rem;
+          background-color: #ff8c42;
+          color: white;
+          border: none;
+          border-radius: 8px;
+          cursor: pointer;
+          transition: background-color 0.3s;
+        "
+      >
+        🔄 重新載入景點
+      </button>
+    </div>
+    <footer>© 2025 TravelGo 南部景點推薦頁 | 製作小組：走吧！旅行趣</footer>
+    <script>
+      // ===== 3. Footer 滑動效果 =====
+      let lastScrollY = window.scrollY;
+      const footer = document.querySelector("footer");
+
+      function handleFooter() {
+        if (window.scrollY > lastScrollY) {
+          // 向下捲動，footer滑入
+          footer.style.transform = "translateY(0)";
+        } else {
+          // 向上捲動，footer滑出
+          footer.style.transform = "translateY(100%)";
+        }
+        lastScrollY = window.scrollY;
+      }
+
+      window.addEventListener("scroll", handleFooter);
+
+      // 預設footer隱藏
+      footer.style.transition = "transform 0.4s";
+      footer.style.transform = "translateY(100%)";
+    </script>
+  </body>
+</html>
